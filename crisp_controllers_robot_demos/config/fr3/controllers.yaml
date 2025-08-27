@@ -21,6 +21,12 @@
       joint_impedance_controller:
         type: crisp_controllers/CartesianController
 
+      torque_feedback_controller:
+        type: crisp_controllers/TorqueFeedbackController
+
+      external_torques_broadcaster:
+        type: franka_broadcasters/ExternalTorquesBroadcaster
+
   joint_trajectory_controller:
     ros__parameters:
       command_interfaces:
@@ -194,4 +200,15 @@
       kd: 0.1
       joint_source_topic: target_joint
       torque_threshold: 0.1
+
+  external_torques_broadcaster:
+    ros__parameters:
+      joints:
+        - fr3_joint1
+        - fr3_joint2
+        - fr3_joint3
+        - fr3_joint4
+        - fr3_joint5
+        - fr3_joint6
+        - fr3_joint7
 
