@@ -1,4 +1,4 @@
-export ROS_DOMAIN_ID=100
+export ROS_DOMAIN_ID=42
 export RMW_IMPLEMENTATION=rmw_zenoh_cpp
 export RUST_LOG=zenoh=severe
 
