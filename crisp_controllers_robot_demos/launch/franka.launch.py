@@ -283,6 +283,7 @@ def generate_launch_description():
                 executable="crisp_py_franka_hand_adapter",
                 name="crisp_py_franka_hand_adapter",
                 output="screen",
+                condition=IfCondition(load_gripper),
             ),
         ]
     )
