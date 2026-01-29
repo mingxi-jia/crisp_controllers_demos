@@ -10,3 +10,8 @@ This repo provides Docker containers to provide directly test the [crisp_control
 
 Check the [docs](https://utiasdsl.github.io/crisp_controllers/misc/demos/) on how to get started with the demos and with CRISP in general.
 
+RMW=cyclone ROS_NETWORK_INTERFACE=enx207bd2cf25b8 ROBOT_IP=172.16.0.2 FRANKA_FAKE_HARDWARE=false docker compose up launch_franka
+
+ROBOT_IP=172.16.0.2 FRANKA_FAKE_HARDWARE=false docker compose up launch_franka
+
+micromamba install ros-humble-ros2-control ros-humble-ros2-controllers

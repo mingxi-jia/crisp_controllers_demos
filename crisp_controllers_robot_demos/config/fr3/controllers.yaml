@@ -170,17 +170,17 @@
       base_frame: base
 
       filter:
-        q: 0.5
-        dq: 0.5
-        output_torque: 0.5
+        q: 0.1
+        dq: 0.1
+        output_torque: 0.1
 
       task:
         k_pos_x: 400.0
         k_pos_y: 400.0
         k_pos_z: 400.0
-        k_rot_x: 30.0
-        k_rot_y: 30.0
-        k_rot_z: 30.0
+        k_rot_x: 60.0
+        k_rot_y: 60.0
+        k_rot_z: 60.0
 
       nullspace: 
         stiffness: 2.0

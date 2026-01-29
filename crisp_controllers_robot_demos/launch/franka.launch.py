@@ -20,6 +20,7 @@ from ament_index_python.packages import get_package_share_directory
 from launch import LaunchContext, LaunchDescription
 from launch.actions import (
     DeclareLaunchArgument,
+    ExecuteProcess,
     IncludeLaunchDescription,
     OpaqueFunction,
     Shutdown,
@@ -118,6 +119,9 @@ def generate_launch_description():
     fake_sensor_commands_parameter_name = "fake_sensor_commands"
     use_rviz_parameter_name = "use_rviz"
     start_robot_state_publisher_name = "start_robot_state_publisher"
+    load_robotiq_parameter_name = "load_robotiq"
+    robotiq_com_port_parameter_name = "robotiq_com_port"
+    robotiq_fake_hardware_parameter_name = "robotiq_fake_hardware"
 
     arm_id = LaunchConfiguration(arm_id_parameter_name)
     arm_prefix = LaunchConfiguration(arm_prefix_parameter_name)
@@ -127,6 +131,9 @@ def generate_launch_description():
     fake_sensor_commands = LaunchConfiguration(fake_sensor_commands_parameter_name)
     use_rviz = LaunchConfiguration(use_rviz_parameter_name)
     start_robot_state_publisher = LaunchConfiguration(start_robot_state_publisher_name)
+    load_robotiq = LaunchConfiguration(load_robotiq_parameter_name)
+    robotiq_com_port = LaunchConfiguration(robotiq_com_port_parameter_name)
+    robotiq_fake_hardware = LaunchConfiguration(robotiq_fake_hardware_parameter_name)
 
     rviz_file = os.path.join(
         get_package_share_directory("franka_description"),
@@ -176,7 +183,7 @@ def generate_launch_description():
             ),
             DeclareLaunchArgument(
                 load_gripper_parameter_name,
-                default_value="true",
+                default_value="false",
                 description="Use Franka Gripper as an end-effector, otherwise, the robot is loaded "
                 "without an end-effector.",
             ),
@@ -189,6 +196,21 @@ def generate_launch_description():
                 start_robot_state_publisher_name,
                 default_value="true",
                 description="",
+            ),
+            DeclareLaunchArgument(
+                load_robotiq_parameter_name,
+                default_value="true",
+                description="Load Robotiq 2F-85 gripper.",
+            ),
+            DeclareLaunchArgument(
+                robotiq_com_port_parameter_name,
+                default_value="/dev/ttyUSB0",
+                description="Serial port for Robotiq gripper.",
+            ),
+            DeclareLaunchArgument(
+                robotiq_fake_hardware_parameter_name,
+                default_value="false",
+                description="Use fake hardware for Robotiq gripper.",
             ),
             Node(
                 package="joint_state_publisher",
@@ -277,6 +299,16 @@ def generate_launch_description():
                 }.items(),
                 condition=IfCondition(load_gripper),
             ),
+            IncludeLaunchDescription(
+                PythonLaunchDescriptionSource(
+                    "/home/ros/ros2_ws/src/crisp_controllers_demos/crisp_controllers_robot_demos/launch/robotiq_gripper.launch.py"
+                ),
+                launch_arguments={
+                    "com_port": robotiq_com_port,
+                    "use_fake_hardware": robotiq_fake_hardware,
+                }.items(),
+                condition=IfCondition(load_robotiq),
+            ),
             Node(
                 package="rviz2",
                 executable="rviz2",
@@ -289,6 +321,13 @@ def generate_launch_description():
                 executable="crisp_py_franka_hand_adapter",
                 name="crisp_py_franka_hand_adapter",
                 output="screen",
+                condition=IfCondition(load_gripper),
+            ),
+            ExecuteProcess(
+                cmd=["python3", "/home/ros/ros2_ws/src/crisp_controllers_demos/crisp_controllers_robot_demos/crisp_controllers_robot_demos/crisp_py_robotiq_adapter.py"],
+                name="crisp_py_robotiq_adapter",
+                output="screen",
+                condition=IfCondition(load_robotiq),
             ),
         ]
     )
