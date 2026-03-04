@@ -174,7 +174,7 @@ class CrispPyRobotiqAdapter(Node):
         self.declare_parameter("gripper_namespace", "gripper")
         self.declare_parameter("controller_name", "robotiq_gripper_controller")
         self.declare_parameter("command_topic", "gripper/gripper_position_controller/commands")
-        self.declare_parameter("joint_state_topic", "gripper/joint_states")
+        self.declare_parameter("joint_state_topic", "gripper/gripper_state")
         self.declare_parameter("joint_state_freq", 50)
 
         gripper_namespace = self.get_parameter("gripper_namespace").value
