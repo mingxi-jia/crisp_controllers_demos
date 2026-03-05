@@ -24,6 +24,7 @@ from launch.actions import (
     IncludeLaunchDescription,
     OpaqueFunction,
     Shutdown,
+    TimerAction,
 )
 from launch.conditions import IfCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
@@ -122,6 +123,8 @@ def generate_launch_description():
     load_robotiq_parameter_name = "load_robotiq"
     robotiq_com_port_parameter_name = "robotiq_com_port"
     robotiq_fake_hardware_parameter_name = "robotiq_fake_hardware"
+    load_ft_sensor_parameter_name = "load_ft_sensor"
+    ft_sensor_ftdi_id_parameter_name = "ft_sensor_ftdi_id"
 
     arm_id = LaunchConfiguration(arm_id_parameter_name)
     arm_prefix = LaunchConfiguration(arm_prefix_parameter_name)
@@ -134,6 +137,8 @@ def generate_launch_description():
     load_robotiq = LaunchConfiguration(load_robotiq_parameter_name)
     robotiq_com_port = LaunchConfiguration(robotiq_com_port_parameter_name)
     robotiq_fake_hardware = LaunchConfiguration(robotiq_fake_hardware_parameter_name)
+    load_ft_sensor = LaunchConfiguration(load_ft_sensor_parameter_name)
+    ft_sensor_ftdi_id = LaunchConfiguration(ft_sensor_ftdi_id_parameter_name)
 
     rviz_file = os.path.join(
         get_package_share_directory("franka_description"),
@@ -211,6 +216,16 @@ def generate_launch_description():
                 robotiq_fake_hardware_parameter_name,
                 default_value="false",
                 description="Use fake hardware for Robotiq gripper.",
+            ),
+            DeclareLaunchArgument(
+                load_ft_sensor_parameter_name,
+                default_value="true",
+                description="Load Robotiq FT sensor.",
+            ),
+            DeclareLaunchArgument(
+                ft_sensor_ftdi_id_parameter_name,
+                default_value="_",
+                description="FTDI ID for Robotiq FT sensor.",
             ),
             Node(
                 package="joint_state_publisher",
@@ -308,6 +323,29 @@ def generate_launch_description():
                     "use_fake_hardware": robotiq_fake_hardware,
                 }.items(),
                 condition=IfCondition(load_robotiq),
+            ),
+            TimerAction(
+                period=5.0,  # Delay FT sensor start to avoid USB contention with gripper
+                actions=[
+                    IncludeLaunchDescription(
+                        PythonLaunchDescriptionSource(
+                            [
+                                PathJoinSubstitution(
+                                    [
+                                        FindPackageShare("crisp_controllers_robot_demos"),
+                                        "launch",
+                                        "robotiq_ft_sensor.launch.py",
+                                    ]
+                                )
+                            ]
+                        ),
+                        launch_arguments={
+                            "namespace": "ft",
+                            "ftdi_id": ft_sensor_ftdi_id,
+                        }.items(),
+                    ),
+                ],
+                condition=IfCondition(load_ft_sensor),
             ),
             Node(
                 package="rviz2",

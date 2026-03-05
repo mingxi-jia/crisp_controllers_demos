@@ -126,7 +126,8 @@ ARG CRISP_CONTROLLERS_VERSION=1.1.0
 
 COPY . src/crisp_controllers_demos
 
-RUN git clone  --branch v${CRISP_CONTROLLERS_VERSION} --depth 1 https://github.com/utiasDSL/crisp_controllers.git src/crisp_controllers
+# it should be db1d81a5f924f9e5bcae59b0b476b0410d37bbbf
+RUN git clone  --branch v${CRISP_CONTROLLERS_VERSION} --depth 1 https://github.com/utiasDSL/crisp_controllers.git src/crisp_controllers 
 RUN git clone https://github.com/danielsanjosepro/franka_broadcasters.git src/franka_broadcasters
 
 # === ROBOTIQ 2F-85 GRIPPER ===
@@ -145,6 +146,13 @@ RUN source /opt/ros/$ROS_DISTRO/setup.bash \
     && colcon build --symlink-install \
         --cmake-args -DCMAKE_BUILD_TYPE=Release \
         --packages-up-to robotiq_description robotiq_driver robotiq_controllers
+
+# ROBOTIQ TORQUE SENSOR
+RUN source /opt/ros/$ROS_DISTRO/setup.bash \
+    && source /home/ros/ros2_ws/install/setup.bash \
+    && git clone https://github.com/panagelak/rq_fts_ros2_driver.git src/rq_fts_ros2_driver \
+    && rosdep install --from-paths src --ignore-src -r -y \
+    && colcon build --parallel-workers $(nproc) --base-paths src --symlink-install --event-handlers desktop_notification- status- --cmake-args -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=ON --packages-select robotiq_ft_sensor_interfaces robotiq_ft_sensor_hardware robotiq_ft_sensor_description
 
 
 FROM kinova AS kinova-overlay

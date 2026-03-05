@@ -164,6 +164,8 @@ services:
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
       - /dev:/dev
       - ./crisp_controllers_robot_demos:/home/ros/ros2_ws/src/crisp_controllers_demos/crisp_controllers_robot_demos
+      - ./crisp_controllers_robot_demos/launch:/home/ros/ros2_ws/install/crisp_controllers_robot_demos/share/crisp_controllers_robot_demos/launch
+      - ./crisp_controllers_robot_demos/config:/home/ros/ros2_ws/install/crisp_controllers_robot_demos/share/crisp_controllers_robot_demos/config
     command: >
       bash -lc "source /opt/ros/humble/setup.bash &&
       source install/setup.bash &&
@@ -171,7 +173,9 @@ services:
       RMW=${RMW:-} source src/crisp_controllers_demos/scripts/setup_middleware.sh &&
       ros2 launch crisp_controllers_robot_demos franka.launch.py
       arm_id:=fr3 use_fake_hardware:=${FRANKA_FAKE_HARDWARE:-false} robot_ip:=${ROBOT_IP:-172.16.0.2} use_rviz:=True
-      load_robotiq:=${LOAD_ROBOTIQ:-true} robotiq_com_port:=${ROBOTIQ_COM_PORT:-/dev/ttyUSB0} robotiq_fake_hardware:=${ROBOTIQ_FAKE_HARDWARE:-false}"
+      load_robotiq:=${LOAD_ROBOTIQ:-true} robotiq_com_port:=${ROBOTIQ_COM_PORT:-/dev/ttyUSB0} robotiq_fake_hardware:=${ROBOTIQ_FAKE_HARDWARE:-false}
+      load_ft_sensor:=${LOAD_FT_SENSOR:-false}
+      ft_sensor_ftdi_id:=${FT_SENSOR_FTDI_ID:-}"
 
   launch_dual_franka:
     <<: *franka-overlay
